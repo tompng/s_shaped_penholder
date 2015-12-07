@@ -1,0 +1,79 @@
+<meta charset=utf-8>
+<script src='svg.js'></script>
+<script>
+onload=function(){
+  svg=new SVG(300,300);
+  svg.trans={x:10,y:10,w:1,h:1};
+  var lw=svg.lineWidth=0.1;
+  var thickness=3;
+  var w=60;
+  var l=60;
+  var curve=60;
+  var duktaRatio=0.75;
+  function dukta(x1,y1,x2,y2,w){
+    var h=Math.sqrt((x2-x1)*(x2-x1)+(y2-y1)*(y2-y1));
+    var h2=w*6
+    if(h2>=h)throw 'error'
+    var x=(x1+x2)/2,y=(y1+y2)/2;
+    var points=[
+      {x:0,y:-0.5*h2},
+      {x:0,y:-0.4*h2},
+      {x:-w/5,y:-0.3*h2},
+      {x:-w/3,y:-0.2*h2},
+      {x:-w/3,y:-0.1*h2},
+      {x:0,y:-0.1*h2},
+      {x:w/3,y:-0.2*h2},
+      {x:w*2/3,y:-0.1*h2},
+      {x:w*2/3,y:0.1*h2},
+      {x:w/3,y:0.2*h2},
+      {x:0,y:0.1*h2},
+      {x:-w/3,y:0.1*h2},
+      {x:-w/3,y:0.2*h2},
+      {x:-w/5,y:0.3*h2},
+      {x:0,y:0.4*h2},
+      {x:0,y:0.5*h2}
+    ];
+    var t=Math.atan2(x2-x1,y2-y1);
+    var cos=Math.cos(t),sin=Math.sin(t);
+    points=points.map(function(p){
+      return {x: x+p.x*cos+p.y*sin, y:y+p.y*cos-p.x*sin};
+    });
+    points.unshift({x:x1,y:y1})
+    points.push({x:x2,y:y2})
+    svg.curve(points);
+  }
+  for(var i=1;i<20;i++){
+    var x=i*3;
+    var y=0;
+    var dw=3;
+    if(i%2==0){
+      dukta(x,y+l*(1-duktaRatio)/4,x,l*(1+duktaRatio)/4,dw)
+      dukta(x,y+l/2+l*(1-duktaRatio)/4,x,l*(3+duktaRatio)/4,dw)
+    }else{
+      svg.line([{x:x,y:y},{x:x,y:y+l*duktaRatio/4}])
+      dukta(x,y+l/2-l*duktaRatio/4,x,y+l/2+l*duktaRatio/4,dw)
+      svg.line([{x:x,y:y+l-l*duktaRatio/4},{x:x,y:y+l}])
+    }
+  }
+  svg.line([{x:0,y:0},{x:0,y:l},{x:60,y:l},{x:60,y:0}],true)
+
+  for(var i=1;i<20;i++){
+    var x=i*3;
+    var y=100;
+    var dw=4;
+    if(i%2==0){
+      dukta(x,y+l*(1-duktaRatio)/2,x,y+l*(1+duktaRatio)/2,dw)
+    }else{
+      svg.line([{x:x,y:y},{x:x,y:y+l*duktaRatio/2}])
+      svg.line([{x:x,y:y+l-l*duktaRatio/2},{x:x,y:y+l}])
+    }
+  }
+  svg.line([{x:0,y:100},{x:0,y:100+l},{x:60,y:100+l},{x:60,y:100}],true)
+
+  var img=new Image();
+  img.src=svg.toDataURL();
+  img.style.border='1px solid red'
+  document.body.appendChild(img);
+}
+
+</script>
