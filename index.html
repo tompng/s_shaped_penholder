@@ -7,7 +7,6 @@ onload=function(){
   var lw=svg.lineWidth=0.1;
   var thickness=3;
   var w=60;
-  var l=60;
   var curve=60;
   var duktaRatio=0.75;
   var duktaW=4;
@@ -63,12 +62,90 @@ onload=function(){
     points.push({x:x2,y:y2})
     svg.curve(points);
   }
-  for(var i=1;i<20;i++){
-    var x=i*3;
-    var y=0;
-    dukta(x,y,x,y+l,i);
+
+  var cornRatio=1/5;
+  var cornHeight=Math.sqrt(1-cornRatio*cornRatio);
+  var cornRad=Math.asin(cornRatio);
+  var cornCos=Math.cos(cornRad),cornSin=Math.sin(cornRad);
+  var th=cornRatio*Math.acos(-cornRatio*cornSin/cornCos);
+  var rDiff=thickness/Math.tan(2*cornRad);
+  var rNormal=w*2/3;
+  var N=8;
+  svg.trans.y+=10;
+  function duktaJoint(p,radius){
+    var points0=[];
+    var points1=[];
+    for(var i=0;i<N;i++){
+      var t=th*i/N;
+      var p0={x:p.x+radius*Math.sin(t),y:p.y+radius*Math.cos(t)-radius}
+      var p1={x:p.x+(radius+w)*Math.sin(t),y:p.y+(radius+w)*Math.cos(t)-radius}
+      points0.push(p0);
+      points1.push(p1);
+      dukta(
+        p0.x, p0.y,
+        p1.x, p1.y,
+        i
+      )
+    }
+    for(var i=0;i<=N;i++){
+      var t=th*i/N-th;
+      var cx=(2*radius+w)*Math.sin(th)
+      var cy=(2*radius+w)*Math.cos(th)-radius
+      var p0={x:p.x+(radius+w)*Math.sin(t)+cx,y:p.y-(radius+w)*Math.cos(t)+cy}
+      var p1={x:p.x+radius*Math.sin(t)+cx,y:p.y-radius*Math.cos(t)+cy}
+      points0.push(p0);
+      points1.push(p1);
+      dukta(
+        p0.x, p0.y,
+        p1.x, p1.y,
+        i
+      )
+    }
+    svg.curve(points0)
+    svg.curve(points1)
+    return points0[points0.length-1];
   }
-  svg.line([{x:0,y:0},{x:0,y:l},{x:60,y:l},{x:60,y:0}],true)
+  function round(x,y,r){
+    var N=40;
+    var points=[];
+    for(var i=0;i<N;i++){
+      points.push({x:x+r*Math.cos(2*Math.PI*i/N),y:y+r*Math.sin(2*Math.PI*i/N)});
+    }
+    svg.curve(points,true);
+  }
+  function corner(x,y,r,t0,t1){
+    var N=10;
+    var points=[];
+    for(var i=0;i<=N;i++){
+      var t=t0+(t1-t0)*i/N;
+      points.push({x:x+r*Math.cos(t),y:y+r*Math.sin(t)});
+    }
+    svg.curve(points);
+  }
+  for(var i=0;i<2;i++){
+    var p={x:0, y:i?w+4:0}
+    svg.line([{x:p.x+w,y:p.y},{x:p.x+5,y:p.y}])
+    corner(p.x+5,p.y+5,5,Math.PI,Math.PI*3/2);
+    svg.line([{x:p.x,y:p.y+5},{x:p.x,y:p.y+w-5}])
+    corner(p.x+5,p.y+w-5,5,Math.PI/2,Math.PI);
+    svg.line([{x:p.x+5,y:p.y+w},{x:p.x+w,y:p.y+w}])
+    if(i)round(p.x+w/2,p.y+w/2,w/3)
+
+    p.x+=w;
+    p=duktaJoint(p,rNormal+(i?0:rDiff));
+    svg.line([{x:p.x,y:p.y},{x:p.x+w,y:p.y}])
+    svg.line([{x:p.x,y:p.y+w},{x:p.x+w,y:p.y+w}])
+    round(p.x+w/2,p.y+w/2,w/3)
+
+    p.x+=w;
+    p=duktaJoint(p,rNormal+(i?rDiff:0));
+    svg.line([{x:p.x,y:p.y},{x:p.x+w-5,y:p.y}])
+    corner(p.x+w-5,p.y+5,5,Math.PI*3/2,Math.PI*2);
+    svg.line([{x:p.x+w,y:p.y+5},{x:p.x+w,y:p.y+w-5}])
+    corner(p.x+w-5,p.y+w-5,5,0,Math.PI/2);
+    svg.line([{x:p.x+w-5,y:p.y+w},{x:p.x,y:p.y+w}])
+    round(p.x+w/2,p.y+w/2,w/3)
+  }
 
 
   var img=new Image();
