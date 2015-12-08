@@ -186,8 +186,7 @@ onload=function(){
     stopperHole(p.x+w/2,p.y+w-w/12,i);
   }
   for(var i=0;i<3;i++){
-    stopper(21+i%2*84,-15+(i/2|0)*8)
-    stopper(59+i%2*84,-14+(i/2|0)*8)
+    for(var j=0;j<3;j++)stopper(23+j*44+90*i,-12+133*i)
   }
 
   var img=new Image();
