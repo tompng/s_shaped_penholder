@@ -63,12 +63,12 @@ onload=function(){
     svg.curve(points);
   }
 
-  var cornRatio=1/5;
-  var cornHeight=Math.sqrt(1-cornRatio*cornRatio);
-  var cornRad=Math.asin(cornRatio);
-  var cornCos=Math.cos(cornRad),cornSin=Math.sin(cornRad);
-  var th=cornRatio*Math.acos(-cornRatio*cornSin/cornCos);
-  var rDiff=thickness/Math.tan(2*cornRad);
+  var coneRatio=1/5;
+  var coneHeight=Math.sqrt(1-coneRatio*coneRatio);
+  var coneRad=Math.asin(coneRatio);
+  var coneCos=Math.cos(coneRad),coneSin=Math.sin(coneRad);
+  var th=coneRatio*Math.acos(-coneRatio*coneSin/coneCos);
+  var rDiff=thickness/Math.tan(coneRad);
   var rNormal=w*2/3;
   var N=10;
   svg.trans.y+=10;
@@ -186,7 +186,7 @@ onload=function(){
     stopperHole(p.x+w/2,p.y+w-w/12,i);
   }
   for(var i=0;i<3;i++){
-    for(var j=0;j<3;j++)stopper(23+j*44+90*i,-12+133*i)
+    for(var j=0;j<3;j++)stopper(23+j*44+90*i,-13+134*i)
   }
 
   var img=new Image();
