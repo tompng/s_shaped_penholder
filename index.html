@@ -128,7 +128,7 @@ onload=function(){
   var stopperL=w/stopperN;
   function stopperHole(x,y,f){
     function rect(x,y){
-      var w=stopperL,h=thickness;
+      var w=stopperL-svg.lineWidth/4,h=thickness-svg.lineWidth/4;
       svg.line([
         {x:x-w/2,y:y-h/2},
         {x:x+w/2,y:y-h/2},
@@ -142,8 +142,8 @@ onload=function(){
   }
   function stopper(x0,y0){
     var points=[];
-    var w=stopperL;
-    var h=thickness;
+    var w=stopperL+svg.lineWidth/4;
+    var h=thickness+svg.lineWidth/2;
     for(var i=-(stopperN-1)/2;i<=(stopperN-1)/2;i+=2){
       var x=x0+i*stopperL*2/3;
       points.push({x:x-w/2,y:y0},{x:x-w/2,y:y0+h},{x:x+w/2,y:y0+h},{x:x+w/2,y:y0})
