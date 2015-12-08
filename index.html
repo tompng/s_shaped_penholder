@@ -11,7 +11,7 @@ onload=function(){
   var duktaRatio=0.75;
   var duktaW=4;
   function dukta(x1,y1,x2,y2,i){
-    var dw=3;
+    var dw=2.5;
     if(i%2==0){
       var a,b,c,d;
       a=1/4-duktaRatio/4;
@@ -70,7 +70,7 @@ onload=function(){
   var th=cornRatio*Math.acos(-cornRatio*cornSin/cornCos);
   var rDiff=thickness/Math.tan(2*cornRad);
   var rNormal=w*2/3;
-  var N=8;
+  var N=10;
   svg.trans.y+=10;
   function duktaJoint(p,radius){
     var points0=[];
@@ -105,11 +105,13 @@ onload=function(){
     svg.curve(points1)
     return points0[points0.length-1];
   }
-  function round(x,y,r){
+  function roundRect(x,y,r){
     var N=40;
     var points=[];
     for(var i=0;i<N;i++){
-      points.push({x:x+r*Math.cos(2*Math.PI*i/N),y:y+r*Math.sin(2*Math.PI*i/N)});
+      var t=2*Math.PI*i/N
+      var r2=r*(1-0.1*Math.cos(4*t))
+      points.push({x:x+r2*Math.cos(t),y:y+r2*Math.sin(t)});
     }
     svg.curve(points,true);
   }
@@ -122,6 +124,37 @@ onload=function(){
     }
     svg.curve(points);
   }
+  var stopperN=6;
+  var stopperL=w/stopperN;
+  function stopperHole(x,y,f){
+    function rect(x,y){
+      var w=stopperL,h=thickness;
+      svg.line([
+        {x:x-w/2,y:y-h/2},
+        {x:x+w/2,y:y-h/2},
+        {x:x+w/2,y:y+h/2},
+        {x:x-w/2,y:y+h/2}
+      ],true);
+    }
+    for(var i=-(stopperN-1)/2+(f?1:0);i<=(stopperN-1)/2;i+=2){
+      rect(x+i*stopperL*2/3,y)
+    }
+  }
+  function stopper(x0,y0){
+    var points=[];
+    var w=stopperL;
+    var h=thickness;
+    for(var i=-(stopperN-1)/2;i<=(stopperN-1)/2;i+=2){
+      var x=x0+i*stopperL*2/3;
+      points.push({x:x-w/2,y:y0},{x:x-w/2,y:y0+h},{x:x+w/2,y:y0+h},{x:x+w/2,y:y0})
+    }
+    for(var i=1-(stopperN-1)/2;i<=(stopperN-1)/2;i+=2){
+      var x=x0+i*stopperL*2/3;
+      points.unshift({x:x+w/2,y:y0},{x:x+w/2,y:y0-h},{x:x-w/2,y:y0-h},{x:x-w/2,y:y0})
+    }
+    svg.line(points,true);
+  }
+
   for(var i=0;i<2;i++){
     var p={x:0, y:i?w+4:0}
     svg.line([{x:p.x+w,y:p.y},{x:p.x+5,y:p.y}])
@@ -129,13 +162,17 @@ onload=function(){
     svg.line([{x:p.x,y:p.y+5},{x:p.x,y:p.y+w-5}])
     corner(p.x+5,p.y+w-5,5,Math.PI/2,Math.PI);
     svg.line([{x:p.x+5,y:p.y+w},{x:p.x+w,y:p.y+w}])
-    if(i)round(p.x+w/2,p.y+w/2,w/3)
+    if(i)roundRect(p.x+w/2,p.y+w/2,w/3)
+    stopperHole(p.x+w/2,p.y+w/12,i);
+    stopperHole(p.x+w/2,p.y+w-w/12,i);
 
     p.x+=w;
     p=duktaJoint(p,rNormal+(i?0:rDiff));
     svg.line([{x:p.x,y:p.y},{x:p.x+w,y:p.y}])
     svg.line([{x:p.x,y:p.y+w},{x:p.x+w,y:p.y+w}])
-    round(p.x+w/2,p.y+w/2,w/3)
+    roundRect(p.x+w/2,p.y+w/2,w/3)
+    stopperHole(p.x+w/2,p.y+w/12,i);
+    stopperHole(p.x+w/2,p.y+w-w/12,i);
 
     p.x+=w;
     p=duktaJoint(p,rNormal+(i?rDiff:0));
@@ -144,9 +181,14 @@ onload=function(){
     svg.line([{x:p.x+w,y:p.y+5},{x:p.x+w,y:p.y+w-5}])
     corner(p.x+w-5,p.y+w-5,5,0,Math.PI/2);
     svg.line([{x:p.x+w-5,y:p.y+w},{x:p.x,y:p.y+w}])
-    round(p.x+w/2,p.y+w/2,w/3)
+    roundRect(p.x+w/2,p.y+w/2,w/3)
+    stopperHole(p.x+w/2,p.y+w/12,i);
+    stopperHole(p.x+w/2,p.y+w-w/12,i);
   }
-
+  for(var i=0;i<3;i++){
+    stopper(21+i%2*84,-15+(i/2|0)*8)
+    stopper(59+i%2*84,-14+(i/2|0)*8)
+  }
 
   var img=new Image();
   img.src=svg.toDataURL();
