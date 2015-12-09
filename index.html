@@ -2,16 +2,15 @@
 <script src='svg.js'></script>
 <script>
 onload=function(){
-  svg=new SVG(300,300);
-  svg.trans={x:10,y:10,w:1,h:1};
+  svg=new SVG(300,150);
+  svg.trans={x:5,y:10,w:1,h:1};
   var lw=svg.lineWidth=0.1;
-  var thickness=3;
-  var w=60;
-  var curve=60;
-  var duktaRatio=0.75;
+  var thickness=2.7;
+  var w=55;
+  var duktaRatio=0.8;
   var duktaW=4;
   function dukta(x1,y1,x2,y2,i){
-    var dw=2.5;
+    var dw=2.1;
     if(i%2==0){
       var a,b,c,d;
       a=1/4-duktaRatio/4;
@@ -70,7 +69,7 @@ onload=function(){
   var th=coneRatio*Math.acos(-coneRatio*coneSin/coneCos);
   var rDiff=thickness/Math.tan(coneRad);
   var rNormal=w*2/3;
-  var N=10;
+  var N=8;
   svg.trans.y+=10;
   function duktaJoint(p,radius){
     var points0=[];
@@ -186,8 +185,19 @@ onload=function(){
     stopperHole(p.x+w/2,p.y+w-w/12,i);
   }
   for(var i=0;i<2;i++){
-    for(var j=0;j<3;j++)stopper((i?113:23)+j*44,i?121:-13)
+    for(var j=0;j<3;j++)stopper((i?113:21)+j*41,i?111:-12)
   }
+  function rect(x,y,w,h){
+    svg.line([{x:x,y:y},{x:x+w,y:y},{x:x+w,y:y+h},{x:x,y:y+h}],true)
+  }
+  function mark(x,y){
+    svg.line([{x:x-1,y:y-1},{x:x+1,y:y+1}])
+    svg.line([{x:x-1,y:y+1},{x:x+1,y:y-1}])
+  }
+  var x=0,y=-15,w=255,h=130
+  // rect(x,y,w,h);
+  mark(x,y)
+  mark(x+w,y+h)
 
   var img=new Image();
   img.src=svg.toDataURL();
